@@ -158,7 +158,7 @@ export function DriverDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {driver.assignedVehicles.map((vehicle: any) => (
+                  {driver.assignedVehicles.map((vehicle: { _id: string; vehicleId: string; make: string; model: string; year: number }) => (
                     <TableRow key={vehicle._id}>
                       <TableCell className="font-medium">{vehicle.vehicleId}</TableCell>
                       <TableCell>{vehicle.make}</TableCell>
@@ -190,7 +190,7 @@ export function DriverDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {driver.trainingHistory.map((training: any) => (
+                  {driver.trainingHistory.map((training: { _id: string; courseName: string; status: string; startDate: string; completionDate: string | null; score: number | null }) => (
                     <TableRow key={training._id}>
                       <TableCell className="font-medium">{training.courseName}</TableCell>
                       <TableCell>
@@ -227,7 +227,7 @@ export function DriverDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {driver.inspectionHistory.map((inspection: any) => (
+                  {driver.inspectionHistory.map((inspection: { _id: string; formName: string; vehicle: string; date: string; status: string; result: string }) => (
                     <TableRow key={inspection._id}>
                       <TableCell className="font-medium">{inspection.formName}</TableCell>
                       <TableCell>{inspection.vehicle}</TableCell>

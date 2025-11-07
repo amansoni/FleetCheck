@@ -13,6 +13,7 @@ import { DriverDetail } from "./pages/DriverDetail"
 import { Vehicles } from "./pages/Vehicles"
 import { VehicleDetail } from "./pages/VehicleDetail"
 import { Inspections } from "./pages/Inspections"
+import { InspectionDetail } from "./pages/InspectionDetail"
 import { Training } from "./pages/Training"
 import { TrainingDetail } from "./pages/TrainingDetail"
 import { Scorecards } from "./pages/Scorecards"
@@ -34,6 +35,7 @@ function App() {
             <Route path="vehicles" element={<Vehicles />} />
             <Route path="vehicles/:id" element={<VehicleDetail />} />
             <Route path="inspections" element={<Inspections />} />
+            <Route path="inspections/:id" element={<InspectionDetail />} />
             <Route path="training" element={<Training />} />
             <Route path="training/:id" element={<TrainingDetail />} />
             <Route path="scorecards" element={<Scorecards />} />

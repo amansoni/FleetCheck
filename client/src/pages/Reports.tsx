@@ -41,7 +41,7 @@ export function Reports() {
 
   useEffect(() => {
     fetchAnalytics();
-  }, [dateRange, toast]);
+  }, [toast]);
 
   const handleGenerateReport = async () => {
     try {
@@ -276,7 +276,7 @@ export function Reports() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {analytics.vehicleStatus.dueForInspection.map((vehicle: any, idx: number) => (
+                        {analytics.vehicleStatus.dueForInspection.map((vehicle: { vehicleId: string; lastInspectionDate: string; daysSince: number; dueDate: string }, idx: number) => (
                           <TableRow key={idx}>
                             <TableCell className="font-medium">{vehicle.vehicleId}</TableCell>
                             <TableCell>{vehicle.lastInspectionDate}</TableCell>

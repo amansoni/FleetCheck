@@ -239,7 +239,7 @@ export function Dashboard() {
                     <CardDescription>Best performing drivers</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {analytics.driverPerformance.topPerformers.map((driver: any, idx: number) => (
+                    {analytics.driverPerformance.topPerformers.map((driver: { driverName: string; complianceScore: number; inspectionPassRate: number; trainingCompletionRate: number }, idx: number) => (
                       <div key={idx} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                         <div>
                           <p className="font-medium">{driver.driverName}</p>
@@ -257,7 +257,7 @@ export function Dashboard() {
                     <CardDescription>Drivers requiring action</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {analytics.driverPerformance.needingAttention.map((driver: any, idx: number) => (
+                    {analytics.driverPerformance.needingAttention.map((driver: { driverName: string; issue: string; recommendation: string }, idx: number) => (
                       <div key={idx} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                         <div>
                           <p className="font-medium">{driver.driverName}</p>

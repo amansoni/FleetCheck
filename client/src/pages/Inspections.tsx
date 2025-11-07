@@ -67,6 +67,7 @@ export function Inspections() {
         description: 'Failed to load inspection data',
         variant: 'destructive',
       });
+      console.error('Error loading inspection data:', error);
     } finally {
       setLoading(false);
     }

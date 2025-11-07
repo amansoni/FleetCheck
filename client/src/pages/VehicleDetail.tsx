@@ -155,7 +155,7 @@ export function VehicleDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {vehicle.assignedDrivers.map((driver: any) => (
+                  {vehicle.assignedDrivers.map((driver: { _id: string; firstName: string; lastName: string; email: string }) => (
                     <TableRow key={driver._id}>
                       <TableCell className="font-medium">{driver.firstName} {driver.lastName}</TableCell>
                       <TableCell>{driver.email}</TableCell>
@@ -185,7 +185,7 @@ export function VehicleDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {vehicle.inspectionHistory.map((inspection: any) => (
+                  {vehicle.inspectionHistory.map((inspection: { _id: string; formName: string; date: string; inspector: string; result: string; issuesFound: number }) => (
                     <TableRow key={inspection._id}>
                       <TableCell className="font-medium">{inspection.formName}</TableCell>
                       <TableCell>{inspection.date}</TableCell>
@@ -211,7 +211,7 @@ export function VehicleDetail() {
               <CardDescription>{vehicle.maintenanceNotes.length} notes recorded</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {vehicle.maintenanceNotes.map((note: any) => (
+              {vehicle.maintenanceNotes.map((note: { _id: string; note: string; date: string }) => (
                 <div key={note._id} className="p-4 border rounded-lg">
                   <div className="flex justify-between items-start mb-2">
                     <p className="font-medium">{note.note}</p>

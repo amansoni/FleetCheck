@@ -132,7 +132,7 @@ export function TrainingDetail() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {course.modules.map((module: any, idx: number) => (
+                {course.modules.map((module: { _id: string; title: string; type: string; duration: number; required: boolean }, idx: number) => (
                   <div key={module._id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
