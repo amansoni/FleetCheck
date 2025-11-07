@@ -7,17 +7,32 @@ import { useForm } from 'react-hook-form';
 import { createDriver, updateDriver } from '@/api/drivers';
 import { useToast } from '@/hooks/useToast';
 
+interface Driver {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  employmentStatus: string;
+  hireDate: string;
+  licenseNumber: string;
+  licenseExpiryDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+}
+
 interface DriverFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  driver?: any;
+  driver?: Driver;
   onClose: () => void;
 }
 
 export function DriverFormModal({ open, onOpenChange, driver, onClose }: DriverFormModalProps) {
   const { toast } = useToast();
-  const { register, handleSubmit, reset, watch } = useForm({
+  const { register, handleSubmit, reset, watch } = useForm<Driver>({
     defaultValues: driver || {
+      _id: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -31,7 +46,7 @@ export function DriverFormModal({ open, onOpenChange, driver, onClose }: DriverF
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Driver) => {
     try {
       if (driver) {
         await updateDriver(driver._id, data);
@@ -48,10 +63,11 @@ export function DriverFormModal({ open, onOpenChange, driver, onClose }: DriverF
       }
       reset();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save driver';
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save driver',
+        description: errorMessage,
         variant: 'destructive',
       });
     }

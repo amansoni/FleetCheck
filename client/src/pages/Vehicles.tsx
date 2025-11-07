@@ -11,19 +11,26 @@ import { useToast } from '@/hooks/useToast';
 import { VehicleFormModal } from '@/components/vehicles/VehicleFormModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
+interface Vehicle {
+  _id: string;
+  vehicleId: string;
+  make: string;
+  model: string;
+  year: number;
+  status: string;
+  assignedDrivers: number;
+  lastInspectionDate: string;
+}
+
 export function Vehicles() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState<any>(null);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
 
   const fetchVehicles = async () => {
     try {
@@ -39,6 +46,10 @@ export function Vehicles() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [toast]);
 
   const handleDelete = async (id: string) => {
     try {

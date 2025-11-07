@@ -7,17 +7,31 @@ import { useForm } from 'react-hook-form';
 import { createVehicle, updateVehicle } from '@/api/vehicles';
 import { useToast } from '@/hooks/useToast';
 
+interface Vehicle {
+  _id: string;
+  vehicleId: string;
+  make: string;
+  model: string;
+  year: number;
+  vin: string;
+  licensePlate: string;
+  status: string;
+  purchaseDate: string;
+  mileage: number;
+}
+
 interface VehicleFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  vehicle?: any;
+  vehicle?: Vehicle;
   onClose: () => void;
 }
 
 export function VehicleFormModal({ open, onOpenChange, vehicle, onClose }: VehicleFormModalProps) {
   const { toast } = useToast();
-  const { register, handleSubmit, reset, watch } = useForm({
+  const { register, handleSubmit, reset, watch } = useForm<Vehicle>({
     defaultValues: vehicle || {
+      _id: '',
       vehicleId: '',
       make: '',
       model: '',
@@ -30,7 +44,7 @@ export function VehicleFormModal({ open, onOpenChange, vehicle, onClose }: Vehic
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Vehicle) => {
     try {
       if (vehicle) {
         await updateVehicle(vehicle._id, data);
@@ -47,10 +61,11 @@ export function VehicleFormModal({ open, onOpenChange, vehicle, onClose }: Vehic
       }
       reset();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save vehicle';
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save vehicle',
+        description: errorMessage,
         variant: 'destructive',
       });
     }

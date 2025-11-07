@@ -9,6 +9,20 @@ import { useToast } from '@/hooks/useToast';
 import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
+interface ChecklistItem {
+  name: string;
+  type: string;
+  required: boolean;
+  helpText: string;
+}
+
+interface TrainingResource {
+  title: string;
+  url: string;
+  type: string;
+  description: string;
+}
+
 interface InspectionFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -25,13 +39,15 @@ export function InspectionFormModal({ open, onOpenChange, onClose }: InspectionF
     },
   });
 
-  const [checklistItems, setChecklistItems] = useState<any[]>([]);
-  const [trainingResources, setTrainingResources] = useState<any[]>([]);
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+  const [trainingResources, setTrainingResources] = useState<TrainingResource[]>([]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Record<string, unknown>) => {
     try {
       await createInspectionForm({
-        ...data,
+        name: String(data.name),
+        description: String(data.description),
+        status: String(data.status),
         checklistItems,
         trainingResources,
         assignedVehicles: [],
@@ -45,10 +61,11 @@ export function InspectionFormModal({ open, onOpenChange, onClose }: InspectionF
       setChecklistItems([]);
       setTrainingResources([]);
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create form';
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create form',
+        description: errorMessage,
         variant: 'destructive',
       });
     }

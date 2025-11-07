@@ -9,11 +9,28 @@ import { ArrowLeft, Mail, Phone, Calendar, FileText } from 'lucide-react';
 import { getDriverById } from '@/api/drivers';
 import { useToast } from '@/hooks/useToast';
 
+interface Driver {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  employmentStatus: string;
+  licenseNumber: string;
+  licenseExpiryDate: string;
+  hireDate: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  assignedVehicles: Array<Record<string, unknown>>;
+  trainingHistory: Array<Record<string, unknown>>;
+  inspectionHistory: Array<Record<string, unknown>>;
+}
+
 export function DriverDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [driver, setDriver] = useState<any>(null);
+  const [driver, setDriver] = useState<Driver | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

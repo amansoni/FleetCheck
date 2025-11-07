@@ -22,7 +22,7 @@ type AuthContextType = {
   loginWithOAuth: () => void;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  setAuthData: (accessToken: string, refreshToken: string, userData: any) => void;
+  setAuthData: (accessToken: string, refreshToken: string, userData: User) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchAuthConfig();
   }, []);
 
-  const setAuthData = (accessToken, refreshToken, userData) => {
+  const setAuthData = (accessToken: string, refreshToken: string, userData: User) => {
     if (accessToken || refreshToken) {
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("accessToken", accessToken);
@@ -143,4 +143,3 @@ export function useAuth() {
   }
   return context;
 }
-

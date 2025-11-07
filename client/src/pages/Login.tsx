@@ -99,12 +99,13 @@ export function Login() {
         description: "Logged in successfully",
       })
       navigate("/")
-    } catch (error) {
-      console.error("Login error:", error.message)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      console.error("Login error:", errorMessage)
       toast({
         variant: "destructive",
         title: "Error",
-        description: error?.message,
+        description: errorMessage,
       })
     } finally {
       setLoading(false)

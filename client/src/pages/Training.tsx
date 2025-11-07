@@ -10,16 +10,22 @@ import { Plus, Search, Eye, BookOpen } from 'lucide-react';
 import { getTrainingCourses } from '@/api/training';
 import { useToast } from '@/hooks/useToast';
 
+interface TrainingCourse {
+  _id: string;
+  name: string;
+  description: string;
+  duration: number;
+  status: string;
+  enrollmentsCount: number;
+  completionRate: number;
+}
+
 export function Training() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<TrainingCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    fetchCourses();
-  }, []);
 
   const fetchCourses = async () => {
     try {
@@ -35,6 +41,10 @@ export function Training() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCourses();
+  }, [toast]);
 
   const filteredCourses = courses.filter(course =>
     course.name.toLowerCase().includes(searchTerm.toLowerCase())

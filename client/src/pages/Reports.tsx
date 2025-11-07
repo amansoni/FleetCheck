@@ -1,9 +1,12 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Truck, FileText, BookOpen, TrendingUp, AlertCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { getDashboardAnalytics } from '@/api/reports';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Download, TrendingUp, AlertCircle } from 'lucide-react';
+import { getDashboardAnalytics, generateReport } from '@/api/reports';
 import { useToast } from '@/hooks/useToast';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -15,30 +18,50 @@ interface Analytics {
   vehicleStatus: Record<string, unknown>;
 }
 
-export function Dashboard() {
-  const { user } = useAuth();
+export function Reports() {
   const { toast } = useToast();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState('30');
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await getDashboardAnalytics();
+      setAnalytics(response.analytics);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load analytics',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const response = await getDashboardAnalytics();
-        setAnalytics(response.analytics);
-      } catch (error) {
-        toast({
-          title: 'Error',
-          description: 'Failed to load dashboard analytics',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAnalytics();
-  }, [toast]);
+  }, [dateRange, toast]);
+
+  const handleGenerateReport = async () => {
+    try {
+      await generateReport({
+        reportType: 'comprehensive',
+        filters: { dateRange },
+        format: 'pdf',
+      });
+      toast({
+        title: 'Success',
+        description: 'Report generated successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to generate report',
+        variant: 'destructive',
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -51,70 +74,79 @@ export function Dashboard() {
   const COLORS = ['#3b82f6', '#ef4444', '#f59e0b'];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-          Dashboard
-        </h1>
-        <p className="text-muted-foreground">Welcome back, {user?.email}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Reports & Analytics</h1>
+          <p className="text-muted-foreground">System performance and compliance metrics</p>
+        </div>
+        <div className="flex gap-2">
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={handleGenerateReport} className="gap-2">
+            <Download className="h-4 w-4" />
+            Generate Report
+          </Button>
+        </div>
       </div>
 
-      {/* KPIs */}
       {analytics && (
         <>
+          {/* KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="backdrop-blur-sm bg-white/50 border-white/20 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="backdrop-blur-sm bg-white/50 border-white/20">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Total Vehicles</CardTitle>
-                <Truck className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.kpis.totalVehicles}</div>
-                <p className="text-xs text-muted-foreground">Active fleet</p>
+                <p className="text-2xl font-bold">{analytics.kpis.totalVehicles}</p>
               </CardContent>
             </Card>
 
-            <Card className="backdrop-blur-sm bg-white/50 border-white/20 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="backdrop-blur-sm bg-white/50 border-white/20">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Total Drivers</CardTitle>
-                <Users className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.kpis.totalDrivers}</div>
-                <p className="text-xs text-muted-foreground">Registered drivers</p>
+                <p className="text-2xl font-bold">{analytics.kpis.totalDrivers}</p>
               </CardContent>
             </Card>
 
-            <Card className="backdrop-blur-sm bg-white/50 border-white/20 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="backdrop-blur-sm bg-white/50 border-white/20">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Inspections</CardTitle>
-                <FileText className="h-4 w-4 text-purple-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.kpis.inspectionsCompleted}</div>
+                <p className="text-2xl font-bold">{analytics.kpis.inspectionsCompleted}</p>
                 <p className="text-xs text-muted-foreground">{analytics.kpis.inspectionPassRate}% pass rate</p>
               </CardContent>
             </Card>
 
-            <Card className="backdrop-blur-sm bg-white/50 border-white/20 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="backdrop-blur-sm bg-white/50 border-white/20">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Compliance</CardTitle>
-                <TrendingUp className="h-4 w-4 text-orange-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.kpis.systemComplianceScore}%</div>
-                <p className="text-xs text-muted-foreground">System score</p>
+                <p className="text-2xl font-bold">{analytics.kpis.systemComplianceScore}%</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Charts */}
+          {/* Tabs */}
           <Tabs defaultValue="inspections" className="space-y-4">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="inspections">Inspections</TabsTrigger>
               <TabsTrigger value="training">Training</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
+              <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
             </TabsList>
 
             <TabsContent value="inspections" className="space-y-4">
@@ -122,7 +154,6 @@ export function Dashboard() {
                 <Card className="backdrop-blur-sm bg-white/50 border-white/20">
                   <CardHeader>
                     <CardTitle>Inspection Frequency</CardTitle>
-                    <CardDescription>Last 5 days</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -142,7 +173,6 @@ export function Dashboard() {
                 <Card className="backdrop-blur-sm bg-white/50 border-white/20">
                   <CardHeader>
                     <CardTitle>Results Breakdown</CardTitle>
-                    <CardDescription>Pass/Fail distribution</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -175,13 +205,12 @@ export function Dashboard() {
               <Card className="backdrop-blur-sm bg-white/50 border-white/20">
                 <CardHeader>
                   <CardTitle>Common Issues</CardTitle>
-                  <CardDescription>Most frequently found issues</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={analytics.inspectionAnalytics.commonIssues}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="issue" />
+                      <XAxis dataKey="issue" angle={-45} textAnchor="end" height={80} />
                       <YAxis />
                       <Tooltip />
                       <Bar dataKey="count" fill="#3b82f6" />
@@ -196,7 +225,6 @@ export function Dashboard() {
                 <Card className="backdrop-blur-sm bg-white/50 border-white/20">
                   <CardHeader>
                     <CardTitle>Completion Rate Trend</CardTitle>
-                    <CardDescription>Last 5 months</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -214,7 +242,6 @@ export function Dashboard() {
                 <Card className="backdrop-blur-sm bg-white/50 border-white/20">
                   <CardHeader>
                     <CardTitle>Course Enrollment</CardTitle>
-                    <CardDescription>Active enrollments</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -231,44 +258,40 @@ export function Dashboard() {
               </div>
             </TabsContent>
 
-            <TabsContent value="performance" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <Card className="backdrop-blur-sm bg-white/50 border-white/20">
-                  <CardHeader>
-                    <CardTitle>Top Performers</CardTitle>
-                    <CardDescription>Best performing drivers</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {analytics.driverPerformance.topPerformers.map((driver: any, idx: number) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{driver.driverName}</p>
-                          <p className="text-sm text-muted-foreground">Score: {driver.complianceScore}%</p>
-                        </div>
-                        <TrendingUp className="h-5 w-5 text-green-500" />
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                <Card className="backdrop-blur-sm bg-white/50 border-white/20">
-                  <CardHeader>
-                    <CardTitle>Needs Attention</CardTitle>
-                    <CardDescription>Drivers requiring action</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {analytics.driverPerformance.needingAttention.map((driver: any, idx: number) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{driver.driverName}</p>
-                          <p className="text-sm text-muted-foreground">{driver.issue}</p>
-                        </div>
-                        <AlertCircle className="h-5 w-5 text-red-500" />
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </div>
+            <TabsContent value="vehicles" className="space-y-4">
+              <Card className="backdrop-blur-sm bg-white/50 border-white/20">
+                <CardHeader>
+                  <CardTitle>Vehicles Due for Inspection</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Vehicle ID</TableHead>
+                          <TableHead>Last Inspection</TableHead>
+                          <TableHead>Days Since</TableHead>
+                          <TableHead>Due Date</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {analytics.vehicleStatus.dueForInspection.map((vehicle: any, idx: number) => (
+                          <TableRow key={idx}>
+                            <TableCell className="font-medium">{vehicle.vehicleId}</TableCell>
+                            <TableCell>{vehicle.lastInspectionDate}</TableCell>
+                            <TableCell>{vehicle.daysSince}</TableCell>
+                            <TableCell>{vehicle.dueDate}</TableCell>
+                            <TableCell>
+                              <Badge variant="destructive">Overdue</Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </>

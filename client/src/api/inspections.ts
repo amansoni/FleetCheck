@@ -167,8 +167,8 @@ export const createInspectionForm = (data: {
   name: string;
   description: string;
   status: string;
-  checklistItems: Array<any>;
-  trainingResources: Array<any>;
+  checklistItems: Array<Record<string, unknown>>;
+  trainingResources: Array<Record<string, unknown>>;
   assignedVehicles: Array<string>;
   assignedDrivers: Array<string>;
 }) => {
@@ -192,8 +192,8 @@ export const submitInspection = (data: {
   vehicleId: string;
   driverId: string;
   mileage: number;
-  checklistResults: Array<any>;
-  issuesFound: Array<any>;
+  checklistResults: Array<Record<string, unknown>>;
+  issuesFound: Array<Record<string, unknown>>;
   overallResult: string;
   inspectorSignature: string;
 }) => {

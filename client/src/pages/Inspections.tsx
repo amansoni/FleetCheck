@@ -11,19 +11,45 @@ import { getInspectionForms, getInspectionAssignments, getInspectionHistory } fr
 import { useToast } from '@/hooks/useToast';
 import { InspectionFormModal } from '@/components/inspections/InspectionFormModal';
 
+interface InspectionForm {
+  _id: string;
+  name: string;
+  description: string;
+  createdDate: string;
+  lastModified: string;
+  status: string;
+  assignedVehiclesCount: number;
+}
+
+interface InspectionAssignment {
+  _id: string;
+  formName: string;
+  vehicle: string;
+  inspector: string;
+  driver: string;
+  dueDate: string;
+  status: string;
+}
+
+interface InspectionRecord {
+  _id: string;
+  formName: string;
+  vehicle: string;
+  date: string;
+  inspector: string;
+  result: string;
+  issuesCount: number;
+}
+
 export function Inspections() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [forms, setForms] = useState<any[]>([]);
-  const [assignments, setAssignments] = useState<any[]>([]);
-  const [history, setHistory] = useState<any[]>([]);
+  const [forms, setForms] = useState<InspectionForm[]>([]);
+  const [assignments, setAssignments] = useState<InspectionAssignment[]>([]);
+  const [history, setHistory] = useState<InspectionRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const fetchData = async () => {
     try {
@@ -45,6 +71,10 @@ export function Inspections() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {

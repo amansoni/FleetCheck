@@ -10,11 +10,27 @@ import { ArrowLeft, Truck, Calendar, Gauge } from 'lucide-react';
 import { getVehicleById } from '@/api/vehicles';
 import { useToast } from '@/hooks/useToast';
 
+interface Vehicle {
+  _id: string;
+  vehicleId: string;
+  make: string;
+  model: string;
+  year: number;
+  vin: string;
+  licensePlate: string;
+  status: string;
+  purchaseDate: string;
+  mileage: number;
+  assignedDrivers: Array<Record<string, unknown>>;
+  inspectionHistory: Array<Record<string, unknown>>;
+  maintenanceNotes: Array<Record<string, unknown>>;
+}
+
 export function VehicleDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [vehicle, setVehicle] = useState<any>(null);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
